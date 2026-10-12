@@ -77,6 +77,15 @@ jobs:
           mkdir -p reports
           pytest -v --junitxml=reports/junit.xml
 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_KEY }}
+        with:
+          args: >
+            -Dsonar.projectKey=MahmoudASeada_ci-assignment
+            -Dsonar.organization=mahmoudaseada
+
       - name: Show test failure
         if: failure()
         run: |
