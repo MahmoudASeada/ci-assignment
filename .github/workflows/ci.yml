@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-report
           path: reports/junit.xml
@@ -109,7 +109,7 @@ jobs:
             temperature.py README.md
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package
           path: dist/temperature-${{ steps.version.outputs.version }}.tar.gz
