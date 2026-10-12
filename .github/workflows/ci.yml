@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run pre-scan
-        uses: ./pre
+        uses: ./.github/pre
   
   test:
     needs: prescan
@@ -132,7 +132,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run post-scan
-        uses: ./post
+        uses: ./.github/post
 
   verify:
     needs: [package, postscan]
