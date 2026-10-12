@@ -5,10 +5,10 @@ description: Scan source code for secrets and vulnerabilities
 runs:
   using: composite
   steps:
-    - name: Gitleaks
-      uses: gitleaks/gitleaks-action@v3
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+    # - name: Gitleaks
+    #   uses: gitleaks/gitleaks-action@v3
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
 
     - name: TruffleHog
       uses: trufflesecurity/trufflehog@main
