@@ -36,6 +36,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 env:
   APP_NAME: temperature
@@ -77,14 +78,11 @@ jobs:
           mkdir -p reports
           pytest -v --junitxml=reports/junit.xml
 
-      # - name: SonarQube Scan
-      #   uses: SonarSource/sonarqube-scan-action@v6
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONARQUBE_KEY }}
-      #   with:
-      #     args: >
-      #       -Dsonar.projectKey=MahmoudASeada_ci-assignment
-      #       -Dsonar.organization=mahmoudaseada
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_KEY }}
+
 
       - name: Show test failure
         if: failure()
