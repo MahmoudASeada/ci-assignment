@@ -36,12 +36,22 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 env:
   APP_NAME: temperature
 
 jobs:
+  prescan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run pre-scan
+        uses: ./.github/pre
+  
   test:
+    needs: prescan
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -68,6 +78,12 @@ jobs:
           mkdir -p reports
           pytest -v --junitxml=reports/junit.xml
 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_KEY }}
+
+
       - name: Show test failure
         if: failure()
         run: |
@@ -81,7 +97,7 @@ jobs:
           path: reports/junit.xml
           if-no-files-found: warn
           retention-days: 5
-
+  
   package:
     needs: test
     if: ${{ needs.test.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.create-package) }}
@@ -116,8 +132,17 @@ jobs:
           if-no-files-found: error
           retention-days: 5
 
-  verify:
+  postscan:
     needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run post-scan
+        uses: ./.github/post
+
+  verify:
+    needs: [package, postscan]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -139,7 +164,7 @@ jobs:
           python3 -c "from temperature import celsius_to_fahrenheit as c; assert c(100) == 212; print('Package OK')"
 
   report:
-    needs: [test, package, verify]
+    needs: [test, package, verify, postscan]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -152,6 +177,7 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
       EVENT_NAME: ${{ github.event_name }}
       NOTIFY_ENABLED: ${{ secrets.NOTIFY_TOKEN != '' }}
+      POSTSCAN_RESULT: ${{ needs.postscan.result }}
 
     steps:
       - name: Write job summary

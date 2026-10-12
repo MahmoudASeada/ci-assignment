@@ -1,0 +1,27 @@
+
+name: Post-scan
+description: Scan the packaged application with Trivy
+
+runs:
+  using: composite
+  steps:
+    - name: Download package artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: package
+        path: dist
+
+    - name: Extract package
+      shell: bash
+      run: |
+        mkdir -p extracted
+        tar -xzf dist/temperature-*.tar.gz -C extracted
+
+    - name: Trivy post-scan
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: fs
+        scan-ref: extracted
+        scanners: vuln,misconfig,secret
+        severity: HIGH,CRITICAL
+        exit-code: '1'
