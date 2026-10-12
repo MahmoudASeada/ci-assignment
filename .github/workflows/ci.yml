@@ -58,7 +58,7 @@ jobs:
         uses: ./post
 
   test:
-    needs: pre-scan
+    needs: prescan
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
