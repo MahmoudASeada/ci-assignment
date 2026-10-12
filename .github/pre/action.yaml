@@ -1,0 +1,25 @@
+
+name: Pre-scan
+description: Scan source code for secrets and vulnerabilities
+
+runs:
+  using: composite
+  steps:
+    - name: Gitleaks
+      uses: gitleaks/gitleaks-action@v3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: TruffleHog
+      uses: trufflesecurity/trufflehog@main
+      with:
+        extra_args: --results=verified,unknown
+
+    - name: Trivy filesystem scan
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: fs
+        scan-ref: .
+        scanners: vuln,misconfig,secret
+        severity: HIGH,CRITICAL
+        exit-code: '1'

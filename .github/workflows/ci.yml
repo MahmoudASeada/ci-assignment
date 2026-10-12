@@ -41,7 +41,24 @@ env:
   APP_NAME: temperature
 
 jobs:
+  prescan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run pre-scan
+        uses: ./pre
+  postscan:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run post-scan
+        uses: ./post
+
   test:
+    needs: pre-scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -81,7 +98,7 @@ jobs:
           path: reports/junit.xml
           if-no-files-found: warn
           retention-days: 5
-
+  
   package:
     needs: test
     if: ${{ needs.test.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.create-package) }}
@@ -117,7 +134,7 @@ jobs:
           retention-days: 5
 
   verify:
-    needs: package
+    needs: [package, postscan]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
