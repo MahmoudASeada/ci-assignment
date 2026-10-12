@@ -71,7 +71,7 @@ jobs:
       - name: Show test failure
         if: failure()
         run: |
-          echo "🚨 Tests failed on ${BRANCH_NAME}"
+          echo "Tests failed on ${BRANCH_NAME}"
 
       - name: Upload test report
         if: always()
