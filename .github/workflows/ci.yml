@@ -48,15 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run pre-scan
         uses: ./pre
-  postscan:
-    needs: package
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run post-scan
-        uses: ./post
-
+  
   test:
     needs: prescan
     runs-on: ubuntu-latest
@@ -132,6 +124,15 @@ jobs:
           path: dist/temperature-${{ steps.version.outputs.version }}.tar.gz
           if-no-files-found: error
           retention-days: 5
+
+  postscan:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run post-scan
+        uses: ./post
 
   verify:
     needs: [package, postscan]
